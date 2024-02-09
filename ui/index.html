@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://kit.fontawesome.com/cbc8c1b733.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/font-awesome.min.css">
+    <title>Document</title>
+</head>
+<body>
+    <div class="container">
+        <div class="con1">
+            <div class="con1_1">
+                <h2 class="vert">CAR RENTAL</h2>
+                <p>RENT A VEHICLE</p>
+            </div>
+            <div class="con1_2">
+                <input type="search" id="search" placeholder="search...">
+            </div>
+            <div class="con1_3">
+                <button class="exit" onclick="closeNui()">Exit</button>
+                <button onclick="closeNui()">ESC</button>
+            </div>
+        </div>
+        <div class="con2">
+            <div class="con2_1">
+                <ul id="categoryList">
+                    <!-- Categories will be dynamically added here -->
+                </ul>
+            </div>
+            <div class="con2_2" id="carContainer">
+                <!-- Cars will be dynamically added here -->
+            </div>
+        </div>
+        <div class="con3">
+            <div class="con3_1">
+                <p class="vert">Rent Time</p>
+                <p>Select the amount of time you want to rent the vehicle for</p>
+            </div>
+            <div class="con3_2">
+                <button class="btn minus-btn disabled" type="button"> < </button>
+                <div><input type="text" id="quantity" value="1"><p>Days</p></div>
+                <button class="btn plus-btn" type="button">></button>
+            </div>
+        </div>
+        <div class="con4">
+            <p class="vert">Payment</p>
+            <p>Total Price</p>
+            <div>
+                <button id="bankingCardBtn">Banking Card</button>
+                <button id="cashBtn">Pay via Cash</button>
+            </div>
+            <p class="total-price vert">
+                <span>$</span>
+                <span id="price">5600</span>
+            </p>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
