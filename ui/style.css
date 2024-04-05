@@ -57,19 +57,12 @@ body {
   overflow: hidden;
   display: none;
   zoom: 1.5;
-  /* justify-content: center; */
-  /* align-items: center; */
 }
-
-/* inset 1. = top,
-inset 2. = right,
-inset 3. = bottom,
-inset 4. = left */
 
 .bg{
   background-color: #20242f;
   inset: 0% 60% 0% 0%;
-  opacity: 0.8;
+  opacity: 0.9;
   position: absolute;
 }
 
