@@ -60,9 +60,9 @@ body {
 }
 
 .bg{
-  background-color: #20242f;
+  background-color: #14161d;
   inset: 0% 60% 0% 0%;
-  opacity: 0.9;
+  opacity: 0.8;
   position: absolute;
 }
 
