@@ -1,217 +1,143 @@
-const container = document.querySelector('.container');
-const carContainer = document.querySelector('.con2_2');
-const priceElement = document.getElementById('price');
-let categories = [];
+cars = []
+carPrice = 0
+carName = ""
+let newPrice = 0
+window.addEventListener("message", function (e) {
+  e = e.data
+  switch (e.action) {
+    case "OPEN":
+      return openMenu(e.data)
+    case "CLOSE":
+      return closeNUI()
+    default:
+      return;
+  }
+});
 
-function handleEscapeKey(e) {
-    if (e.key === 'Escape') {
-        container.style.display = 'none';
-        updatePayment();
-        fetch('https://TN-rental/close', { method: 'POST' });
-    }
+// esc close
+
+document.onkeyup = function (data) {
+  if (data.which == 27) {
+    closeNUI();
+  }
 }
 
-function closeNui() {
-    container.style.display = 'none';
-    updatePayment();
-    fetch('https://TN-rental/close', { method: 'POST' });
+openMenu = (data) => {
+  cars = data["Cars"]
+  setCategory(data["Category"])
+  setCar(data["Category"][0].name)
+
+  $('body').css('display', 'block')
 }
 
-function updatePayment() {
-    const selectedCar = document.querySelector('.car.active');
-    if (selectedCar) {
-        document.getElementById('quantity').value = 1;
-        valueCount = 1;
-        const carPrice = selectedCar.querySelector('.line').innerText.substring(1);
-        updateTotalPrice(carPrice * 1);
-    }
+setCategory = (data) => {
+  $('.category-box').empty()
+  data.forEach(element => {
+    $('.category-box').append(`
+    <div class="item" data-name="${element.name}">
+      <i class="fa fa-map-marker-alt"></i>
+      <div class="name">${element.name}</div>
+    </div>
+    `)
+  });
 }
 
-// Function to handle payment with banking card
-function payWithCard() {
-    handlePayment('bank');
-}
-
-// Function to handle payment with cash
-function payWithCash() {
-    handlePayment('cash');
-}
-
-// Common function to handle payment
-function handlePayment(paymentMethod) {
-    const selectedCar = document.querySelector('.car.active');
-    if (selectedCar) {
-        const carName = selectedCar.querySelector('p').innerText;
-        const carPrice = selectedCar.querySelector('.line').innerText.substring(1);
-        const rentTime = document.getElementById('quantity').value;
-
-        const paymentData = {
-            carname: carName,
-            payment: carPrice * rentTime,
-            renttime: rentTime,
-            paymentmethod: paymentMethod,
-        };
-
-        // Use fetch to send the payment data
-        fetch('https://TN-rental/pay', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(paymentData),
-        });
-
-        // Close the container after payment
-        container.style.display = 'none';
-        updatePayment();
-    }
-}
-
-
-function updateCategoriesList() {
-    const categoryList = document.querySelector('.con2_1 ul');
-    categoryList.innerHTML = '';
-    categories.forEach(category => {
-        categoryList.innerHTML += `<li><button class="menu-btn" id="${category.name}">${category.name}</button></li>`;
-    });
-
-    categoryList.addEventListener('click', handleCategoryButtonClick);
-}
-
-function showCarsInCategory(category) {
-    resetActiveCar();
-    carContainer.innerHTML = '';
-
-    let firstCarPrice = 0;
-
-    categories.forEach(categoryData => {
-        if (category === categoryData.name || category === 'All') {
-            categoryData.cars.forEach((car, index) => {
-                const carButton = createCarButton(car, category, 'All');
-                carContainer.appendChild(carButton);
-
-                if (index === 0) {
-                    firstCarPrice = car.price;
-                    carButton.classList.add('active'); // Add 'active' class to the first car in the selected category
-                }
-            });
-        }
-    });
-
-    updateTotalPrice(firstCarPrice);
-    handleQuantityChange();
-}
-
-function createCarButton(car, category, allClass) {
-    const carButton = document.createElement('button');
-    carButton.classList.add('car', category, allClass);
-    carButton.innerHTML = `
-        <p>${car.name}</p>
-        <div class="image-container">
-            <img src="imgs/${car.name}.png" alt="${car.name}">
+setCar = (data) => {
+  $('.car-box').empty()
+  cars[data].forEach(element => {
+    $('.car-box').append(`
+    <div data-name="${element.model}"  data-price="${element.price}" class="car-item">
+        <div class="car-name">${element.name}</div>
+        <div class="car-day">1 day</div>
+        <div class="car-price">$${element.price}</div>
+        <div class="car-line"></div>
+        <div class="car-img">
+          <img src="${element.img}" alt="">
         </div>
-        <p>Day</p>
-        <p class="line">$${car.price}</p>
-    `;
-    carButton.addEventListener('click', handleCarButtonClick);
-
-    return carButton;
+      </div>
+    `)
+  });
 }
 
-function handleQuantityChange() {
-    const selectedCar = document.querySelector('.car.active');
-    if (selectedCar) {
-        const carPrice = selectedCar.querySelector('.line').innerText.substring(1);
-        updateTotalPrice(carPrice * valueCount); // Update total price based on quantity change
+closeNUI = () => {
+  $.post(`https://TN-rental/close`, JSON.stringify({}));
+  $('body').css('display', 'none')
+}
+
+
+$(".search-input input").on("input", function () {
+  let value = $(this).val().toLowerCase()
+  $('.car-item').filter(function () {
+    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+  })
+})
+
+
+$(document).on('click', '.pay-button', function (e) {
+  payType = $(this).data('type')
+  $.post(`https://TN-rental/rent`, JSON.stringify({
+    carName: carName,
+    carPrice: newPrice,
+    carDay: $('.day-text').text().split(" ")[0],
+    payType: payType
+  }));
+  closeNUI()
+})
+
+$(document).on('click', '.counter', function (e) {
+  if (carPrice == 0) {
+    return
+  }
+  e.preventDefault()
+  let counter = $(".day-text")
+  let count = $(counter).text().split(" ")[0]
+  let rotation = $(this).data('rotation')
+  if (rotation == "left") {
+    count++
+    newPrice = count * carPrice; // Adjust the price calculation using the initial car price
+  } else {
+    if (count > 1) {
+      count--
+      newPrice = count * carPrice; // Adjust the price calculation using the initial car price
     }
-}
+  }
+  if (count < 2) {
+    return
+  }
+  $('.total-price').text("$" + Number(newPrice))
+  counter.text(count + " Day")
+})
 
 
-function handleCarButtonClick(event) {
-    resetActiveCar();
-    const selectedCar = event.target;
-    selectedCar.classList.add('active');
-    
-    const carPrice = selectedCar.querySelector('.line').innerText.substring(1);
-    const quantity = document.getElementById('quantity').value;
 
-    updateTotalPrice(carPrice * quantity);
-}
+$(document).on('click', '.category-box .item', function (e) {
+  categoryName = $(this).data('name')
+  setCar(categoryName)
 
-function updateTotalPrice(price) {
-    priceElement.innerText = price;
-}
+  $('.category-box .item').css('background-color','rgba(64, 66, 68, 0.3')
+  $('.category-box .item').css('border','none')
+  $('.category-box .item').children('i').css('color','#545f5d')
+  $('.category-box .item').children('.name').css('color','#88888e')
 
-function resetActiveBtns() {
-    document.querySelectorAll('.menu-btn').forEach(btn => {
-        btn.classList.remove('active-btn');
-    });
-}
+  $(this).css('background-color','rgb(9, 66, 57,0.5)')
+  $(this).css('border','1px solid #15c7a3')
+  $(this).children('i').css('color','#15c7a3')
+  $(this).children('.name').css('color','#15c7a3')
 
-function resetActiveCar() {
-    document.querySelectorAll('.car').forEach(btn => {
-        btn.classList.remove('active');
-    });
-}
+})
 
-function handleCategoryButtonClick(event) {
-    resetActiveBtns();
-    const category = event.target.id;
-    event.target.classList.add('active-btn');
-    showCarsInCategory(category);
-    handleQuantityChange();
-}
+$(document).on('click', '.car-box .car-item', function (e) {
+  carPrice = $(this).data('price')
+  carName = $(this).data('name')
+  $('.car-box .car-item').css('background-color','rgba(64, 66, 68, 0.3')
+  $('.car-box .car-item').css('border','none')
+  $('.car-box .car-item').children('i').css('color','#545f5d')
+  $('.car-box .car-item').children('.name').css('color','#88888e')
 
-document.getElementById('quantity').addEventListener('input', handleQuantityChange);
-
-document.querySelector('.plus-btn').addEventListener('click', function () {
-    valueCount = document.getElementById('quantity').value;
-    valueCount++;
-    document.getElementById('quantity').value = valueCount;
-    handleQuantityChange();
-});
-
-document.querySelector('.minus-btn').addEventListener('click', function () {
-    valueCount = document.getElementById('quantity').value;
-    valueCount = Math.max(1, valueCount - 1);
-    document.getElementById('quantity').value = valueCount;
-    handleQuantityChange();
-
-    // Remove the disabled attribute
-    document.querySelector('.minus-btn').removeAttribute('disabled');
-});
-
-
-// Add event listener to Banking Card button
-document.getElementById('bankingCardBtn').addEventListener('click', payWithCard);
-
-// Add event listener to Pay via Cash button
-document.getElementById('cashBtn').addEventListener('click', payWithCash);
-
-
-const menuBtns = document.querySelectorAll('.menu-btn');
-menuBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        resetActiveBtns();
-        showCarsInCategory(btn.id);
-        btn.classList.add('active-btn');
-    });
-});
-
-window.addEventListener('message', function (event) {
-    if (event.data.action === 'show') {
-        container.style.display = 'block';
-        categories = event.data.data.categories;
-        updateCategoriesList();
-        showCarsInCategory(categories[0].name);
-        resetActiveBtns(); // Reset initially active button
-        const firstCategoryButton = document.querySelector('.con2_1 .menu-btn'); // Select the first category button
-        if (firstCategoryButton) {
-            firstCategoryButton.classList.add('active-btn');
-        }
-    }
-});
-
-
-// Escape key event
-window.addEventListener('keydown', handleEscapeKey);
+  $(this).css('background-color','rgb(9, 66, 57,0.5)')
+  $(this).css('border','1px solid #15c7a3')
+  $(this).children('i').css('color','#15c7a3')
+  $(this).children('.name').css('color','#15c7a3')
+  $('.total-price').text("$" + carPrice)
+  $(".day-text").text(1 + " Day")
+})

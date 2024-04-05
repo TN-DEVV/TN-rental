@@ -1,7 +1,7 @@
 fx_version 'cerulean'
 game 'gta5'
 author 'DON'
-version '1.0.0'
+version '1.5.0'
 shared_scripts {
     'config.lua',
 }
@@ -16,7 +16,8 @@ ui_page 'ui/index.html'
 files {
     'ui/script.js',
     'ui/index.html',
-    'ui/imgs/*.png',
+    'ui/fonts/*.ttf',
+    'ui/Akrobat-Black.otf',
     'ui/style.css'
 }
 escrow_ignore {

@@ -6,7 +6,7 @@ local spawncarcoords
 
 local function openRentMenu(data)
     SendNUIMessage({
-        action = "show",
+        action = "OPEN",
         data = data
     })
     SetNuiFocus(true, true)
@@ -54,7 +54,7 @@ local function createPeds()
                     icon = v["targetIcon"],
                     action = function()
                         spawncarcoords = v.carspawn,
-                        openRentMenu(v.category)
+                        openRentMenu(v.categorie)
                     end,
                 }
             },
@@ -99,17 +99,14 @@ RegisterNUICallback('close', function()
     SetNuiFocus(false, false)
 end)
 
-RegisterNUICallback('pay', function(data)
+RegisterNUICallback('rent', function(data)
     SetNuiFocus(false, false)
     if IsAnyVehicleNearPoint(spawncarcoords.x, spawncarcoords.y, spawncarcoords.z, 2.0) then
         QBCore.Functions.Notify("Vehicle Spot is occupied", "error", 4500)
         return
     end
+    if tonumber(data.carDay) < 1 then QBCore.Functions.Notify("Do not push me to ban you please", "error", 4500) return end
     TriggerServerEvent("tn-rental:sv:rentVehicle", data)
-    print(data.carname)
-    print(data.payment)
-    print(data.renttime)
-    print(data.paymentmethod)
 end)
 
 RegisterNetEvent('tn-rental:cl:spawnVehicle', function(model,time)
@@ -119,7 +116,7 @@ RegisterNetEvent('tn-rental:cl:spawnVehicle', function(model,time)
         TriggerEvent("vehiclekeys:client:SetOwner", plate)
         SetVehicleEngineOn(vehicle, true, true)
         SetVehicleDirtLevel(vehicle, 0.0)
-        exports["cdn-fuel"]:SetFuel(vehicle, 100)
+        exports[Config.Fuel]:SetFuel(vehicle, 100)
         TriggerServerEvent("tn-rental:sv:updatesql", plate, model, time)
     end, spawncarcoords, true)
 end)
@@ -131,3 +128,8 @@ CreateThread(function()
     end
 end)
 
+
+RegisterNetEvent('qb-don:client:openloststashes', function(stash)
+    TriggerServerEvent("inventory:server:OpenInventory", "stash", stash)
+    TriggerEvent("inventory:client:SetCurrentStash", stash)
+end)
