@@ -160,10 +160,10 @@ Config.Locations = {
         ['ped'] = 'a_m_m_hasjew_01',
         ['scenario'] = 'WORLD_HUMAN_STAND_MOBILE',
         ['radius'] = 1.5,
-        ['targetIcon'] = 'fas fa-boat',
+        ['targetIcon'] = 'fas fa-ship',
         ['targetLabel'] = 'Rent Boat',
         ['showblip'] = true,
-        ['blipsprite'] = 38,
+        ['blipsprite'] = 471,
         ['blipscale'] = 0.6,
         ['blipcolor'] = 38
     },
