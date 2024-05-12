@@ -5,7 +5,7 @@ RegisterNetEvent('tn-rental:sv:rentVehicle', function(data)
     local Player = QBCore.Functions.GetPlayer(src)
     local cid = Player.PlayerData.citizenid
     if data.payType == "cash" then
-        if Player.Functions.GetMoney(data.payType) >= data.carPrice then
+        if Player.Functions.GetMoney("cash") >= data.carPrice then
             Player.Functions.RemoveMoney('cash', data.carPrice, 'cash transfer')
             TriggerClientEvent('tn-rental:cl:spawnVehicle', src, data.carName, data.carDay)
             TriggerClientEvent('QBCore:Notify', src,'Purchase transaction successful', 'success')
@@ -15,7 +15,7 @@ RegisterNetEvent('tn-rental:sv:rentVehicle', function(data)
         end
     else        
         if Player.PlayerData.money.bank >= data.carPrice then
-            Player.Functions.RemoveMoney(data.payType, data.carPrice)
+            Player.Functions.RemoveMoney("bank", data.carPrice)
             TriggerClientEvent('tn-rental:cl:spawnVehicle', src, data.carName, data.carDay)
             TriggerClientEvent('QBCore:Notify', src,'Purchase transaction successful', 'success')
         else
@@ -60,24 +60,3 @@ RegisterNetEvent('tn-rental:sv:checktime', function()
         end
     end
 end)
-
---[[QBCore.Commands.Add('getoldstash', "get your old stashes", {}, false, function(source)
-    local src = source
-    local apartment = MySQL.Sync.fetchScalar('SELECT name FROM apartments WHERE citizenid = ?', {QBCore.Functions.GetPlayer(src).PlayerData.citizenid})
-    TriggerClientEvent('qb-don:client:openloststashes',src,apartment)
-end)]]
-
-QBCore.Commands.Add("getplayerstash", "", {{name = "id", help = "id"}}, false, function(source, args)
-	local src = source
-	if not QBCore.Functions.HasPermission(src, 'admin') then return TriggerClientEvent('QBCore:Notify', src, "You are no Admin", "error") end
-	local Ply = QBCore.Functions.GetPlayer(source)
-	if args[1] then
-		local Player = QBCore.Functions.GetPlayer(tonumber(args[1]))
-		if Player then
-            local apartment = MySQL.Sync.fetchScalar('SELECT name FROM apartments WHERE citizenid = ?', {Player.PlayerData.citizenid})
-            TriggerClientEvent('qb-don:client:openloststashes',Player.PlayerData.source,apartment)
-		else
-			TriggerClientEvent('QBCore:Notify', src, "not online", "error")
-		end
-	end
-end, "admin")
