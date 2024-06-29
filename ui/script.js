@@ -129,6 +129,8 @@ $(document).on('click', '.category-box .item', function (e) {
 $(document).on('click', '.car-box .car-item', function (e) {
   carPrice = $(this).data('price')
   carName = $(this).data('name')
+  newPrice = carPrice; // Initialize newPrice with the car price
+
   $('.car-box .car-item').css('background-color','rgba(64, 66, 68, 0.3')
   $('.car-box .car-item').css('border','none')
   $('.car-box .car-item').children('i').css('color','#545f5d')
